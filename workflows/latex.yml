@@ -1,10 +1,10 @@
-name: Build and Commit PDF
+name: Build LaTeX PDF
 
 on:
   push:
     paths:
       - 'paper/**'
-  workflow_dispatch:
+      - '.github/workflows/latex.yml'
 
 jobs:
   build_latex:
@@ -12,25 +12,24 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/checkout@v3
 
-      - name: Compile LaTeX
-        uses: xu-cheng/latex-action@v3
+      - name: Set up TeX Live
+        uses: xu-cheng/latex-action@v2
         with:
           root_file: paper/main.tex
 
-      - name: Commit generated PDF
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: paper-pdf
+          path: paper/main.pdf
+
+      - name: Commit PDF to repository
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          if [ -f paper/main.pdf ]; then
-            git add paper/main.pdf
-            git commit -m "🤖 Auto-compiled paper PDF on push"
-            git push
-          else
-            echo "No PDF generated"
-          fi
-
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git pull --rebase
+          git add paper/main.pdf
+          git commit -m "Auto-compile PDF on push"
+          git push
