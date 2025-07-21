@@ -1,0 +1,163 @@
+\documentclass[10pt,a4paper,twoside]{article}
+% The following LaTeX packages must be installed on your machine: amsmath, authblk, bm, booktabs, caption, dcolumn, fancyhdr, geometry, graphicx, hyperref, latexsym, natbib
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%PACKAGES
+\usepackage{amsfonts, amsmath, amssymb}
+\usepackage{authblk}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{dcolumn}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{latexsym}
+
+\usepackage{gensymb}
+\usepackage{physics}
+\usepackage{upgreek}
+\usepackage{xparse}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Please make sure that spp.dat (supplied with this template) is in your working directory or path
+\input{spp2025.dat}
+
+%  Editorial staff will uncomment the next line
+% \providecommand{\artnum}[0]{XX-XX}
+% \renewcommand{\articlenum}[0]{SPP-\the\year-\artnum-}
+
+\begin{document}
+
+%--------------------------------------------------
+%  Fill in the paper's title in Sentence case
+%  Titles beginning with articles (A, An, The) are discouraged
+%--------------------------------------------------
+\title{\TitleFont Simulating MRI Signal Contrast Using Spatially Varying $\vb*{T_1}$ and $\vb*{T_2}$ Relaxation Times via the Bloch Equations}
+
+
+%--------------------------------------------------
+% For TWO authors with the same affiliation please use this block
+% Or Please use the other author block templates
+%--------------------------------------------------
+%\author[*\negthickspace]{Author M.~Surname}
+%\author[ ]{Bauthor D.~Surname~III\lastauthorsep}
+%\affil[ ]{Department of Science, XXX University, Country}
+%\affil[*]{\corremail{amsurname@university.edu} }
+
+%--------------------------------------------------
+%  For three or more authors with the same affiliation please use this block
+%--------------------------------------------------
+
+\author[a,*]{Renato III F. Bolo\authorsep}
+\author[a]{Aldrin James R. Garcia\authorsep}
+\author[a]{Mariane R. Madlangsakay\authorsep}
+\author[a]{Crisleo John II E. Martinito\authorsep}
+\author[a]{Katlyn Faye B. Nacague\authorsep}
+\author[a]{Herbert B. Domingo\lastauthorsep}
+\affil[a]{Department of Physical Sciences and Mathematics, University of the Philippines Manila}
+% yung nakaindicate sa affil is \affil[ ]{Department of Science, XXX University, Country}
+\affil[*]{\corremail{rfbolo@up.edu.ph} }
+
+%--------------------------------------------------
+%  For authors with different affiliations please use the following block
+%--------------------------------------------------
+% \author[1*]{Author M.~Surname\authorsep}
+% \author[2]{Bauthor D.~Surname~Jr.\authorsep}
+% \author[1,2]{Coauthor G.~Surname~III\authorsep}
+% % !!! Please take note that the last author separation is \lastauthorsep instead of \authorsep
+% \author[3]{Dauthor G.~Surname\lastauthorsep}
+% \affil[1]{Department of Physics, DD University, Country}
+% \affil[2]{Department of Science, XX University, Country}
+% \affil[3]{Physics Institute, Country}
+% \affil[*]{\corremail{amsurname@university.edu} }
+\maketitle
+\thispagestyle{titlestyle}
+%--------------------------------------------------
+% the main text of your paper begins here
+%--------------------------------------------------
+\section{Introduction}\label{sec:intro}
+Magnetic Resonance Imaging (MRI) is a powerful, non-invasive imaging modality whose contrast is governed by intrinsic tissue parameters: the longitudinal relaxation time ($T_1$) and the transverse relaxation relaxation time ($T_2$) \cite{brown2014}. The response of tissues to radiofrequency excitation and the relaxation dynamics are described by the Bloch equations \cite{bloch1946}, which capture the time evolution of the net magnetization vector under specific imaging parameters such as repetition time ($T_R$) and echo time ($T_E$).
+
+The steady-state solution of the Bloch equations for a spin-echo sequence provides a formula for the observed signal intensity based on $T_1, T_2,$ and other sequence parameters \cite{bernstein2004}.  This project leverages this steady-state solution to explore how intra-regional variations in \(T_1\) and \(T_2\) (e.g., within a lesion) affect the final signal intensity and perceived image contrast.
+
+While many educational simulations treat tissue regions as homogeneous in relaxation behavior, real biological tissue---particularly pathological tissue---often exhibits heterogeneity in relaxation parameters due to perfusion, necrosis, edema, or other microstructural effects \cite{tofts2003}. Simulating these variations can provide insight into how MRI encodes subtle differences in tissue composition.
+
+\section{Objectives}\label{sec:objectives}
+The primary objective of this study is to simulate and analyze MRI signal contrast arising from spatially varying \(T_1\) and \(T_2\) relaxation times within a tissue slice using the Bloch equations. To achieve this, the study specifically aims to:
+\begin{enumerate}
+    \item Implement a computational model for MRI signal intensity using the steady-state solution of the Bloch equations under spin-echo conditions;
+    \item Encode spatial variation in relaxation parameters (\(T_1\), \(T_2\)) within a lesion region embedded in homogeneous background tissue; and
+    \item Generate and visualize synthetic contrast maps to assess the effect of intra-lesion gradients on signal intensity.
+\end{enumerate}
+
+\section{Methodology}\label{sec:methods}
+
+\subsection{Overview}
+
+This project simulates the MRI signal produced by a tissue slice with spatially varying relaxation times under a spin-echo pulse sequence. A 2D matrix (phantom) will be used to represent a 25-pixel cross-sectional slice, where the background tissue is homogeneous gray matter and a circular lesion is embedded at the center. While the background will have fixed longitudinal and transverse relaxation values (\(T_1\), \(T_2\)), the lesion region will exhibit radial gradients in both parameters, simulating intra-lesion heterogeneity.
+
+The net magnetization vector \(\vb{M}(t)\) evolves according to the Bloch equations:
+\begin{align}
+\frac{d\vb{M}}{dt} = \gamma \vb{M} \times \vb{B} - 
+\begin{bmatrix}
+    M_x / T_2 \\
+    M_y / T_2 \\
+    (M_z - M_0)/ T_1
+\end{bmatrix}
+\end{align}
+where \( \gamma \) is the gyromagnetic ratio, \( \vb{B} \) is the effective magnetic field, and \( M_0 \) is the equilibrium magnetization. For this simulation, we consider the steady-state signal under a spin-echo imaging sequence.
+
+\subsection{Signal Equation (Spin-Echo)}
+
+In a conventional spin-echo (SE) imaging sequence with repeated radiofrequency (RF) excitations, the observable signal intensity at each voxel $(x, y)$ can be modeled. After an initial transient period, the longitudinal magnetization reaches a dynamic equilibrium. If the repetition time (TR) is sufficiently long for the transverse magnetization to decay to zero before the next RF pulse, the system is said to be in a steady-state incoherent (SSI) condition. 
+
+Under these circumstances, the steady-state transverse magnetization, which is directly propor- tional to the MRI signal, is given by:
+\begin{align}
+    S(x, y) = \rho(x, y) \left(1 - e^{-TR / T_1(x, y)} \right) e^{-TE / T_2(x, y)}
+\end{align}
+where:
+\begin{itemize}
+    \item \(S(x, y)\) is the MRI signal intensity,
+    \item \(\rho(x, y)\) is the proton density (set to 1.0 throughout),
+    \item \(TR = 2000 \text{ ms}\), repetition time,
+    \item \(TE = 100 \text{ ms}\), echo time,
+    \item \(T_1(x, y)\) and \(T_2(x, y)\) are the voxelwise relaxation times.
+\end{itemize}
+
+\subsection{Phantom Design}
+
+We construct a \(128 \times 128\) voxel matrix representing a tissue slice. A circular lesion of radius 25 pixels is placed at the center. The following parameter values are assigned:
+
+\begin{itemize}
+    \item \textit{Background (gray matter):} \(T_1 = 920\) ms; \(T_2 = 100\) ms
+    \item \textit{Lesion Center (core):} \(T_1 = 1000\) ms; \(T_2 = 90\) ms
+    \item \textit{Lesion Edge:} \(T_1 = 1400\) ms; \(T_2 = 130\) ms
+\end{itemize}
+
+\noindent The lesion's \(T_1\) and \(T_2\) values vary radially from center to edge:
+\begin{align}
+    T_1(x, y) = T_{1,\text{core}} + \left( T_{1,\text{edge}} - T_{1,\text{core}} \right) \cdot \frac{r(x, y)}{r_{\max}} \\
+    T_2(x, y) = T_{2,\text{core}} + \left( T_{2,\text{edge}} - T_{2,\text{core}} \right) \cdot \frac{r(x, y)}{r_{\max}}
+\end{align}
+where \( r(x, y) \) is the Euclidean distance from the lesion center and \( r_{\max} \) is the lesion radius.
+
+\subsection{Simulation Platform}
+
+All simulations will be implemented in Python using \texttt{NumPy} for numerical array operations and \texttt{Matplotlib} for image visualization. The outputs will include:
+\begin{itemize}
+    \item A 2D \(T_1\) relaxation map
+    \item A 2D \(T_2\) relaxation map
+    \item A 2D signal intensity map computed from the spin-echo Bloch equation
+\end{itemize}
+
+
+
+
+
+
+% Please use the style file spp-bst.bst. If you wish to use BibTeX, kindly use us the filename bibfile.bib for your bib file.
+\bibliographystyle{spp-bst}
+\bibliography{bibfile}
+
+\end{document}
