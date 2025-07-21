@@ -26,4 +26,3 @@ Aldrin James R. Garcia
 Mariane R. Madlangsakay  
 Crisleo John II E. Martinito  
 Katlyn Faye B. Nacague
-UP Manila
