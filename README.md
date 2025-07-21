@@ -21,4 +21,9 @@ This project simulates MRI signal contrast using voxel-wise spatially varying \(
    ```
 
 ## Authors
-Group 2 – AP191, UP Manila
+Renato III F. Bolo  
+Aldrin James R. Garcia  
+Mariane R. Madlangsakay  
+Crisleo John II E. Martinito  
+Katlyn Faye B. Nacague
+UP Manila
