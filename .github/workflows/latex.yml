@@ -1,0 +1,35 @@
+name: Build and Commit LaTeX PDF
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up LaTeX environment
+      uses: dante-ev/latex-action@v2
+      with:
+        root_file: paper/main.tex
+        work_in_root_file_dir: true
+
+    - name: Copy output PDF to paper folder
+      run: |
+        cp paper/main.pdf paper/main_compiled.pdf
+
+    - name: Commit and push compiled PDF
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add paper/main_compiled.pdf
+        git commit -m "🤖 Auto-compile LaTeX PDF and update paper/main_compiled.pdf"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
