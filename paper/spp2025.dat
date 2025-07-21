@@ -1,18 +1,3 @@
-\usepackage{latexsym}      % needed math symbols
-\usepackage{hyperref}
-\hypersetup{
- colorlinks=true,
- citecolor=blue,
- linkcolor=blue,
- urlcolor=blue,
- pdfpagemode=UseNone,
- pdfstartview=FitH}
-\usepackage{graphicx}      % for importing eps figures
-\usepackage{amsmath}       % for advanced math symbols
-\usepackage[affil-sl]{authblk} 			% found in preprint bundle package, http://ctan.org/pkg/preprint
-\usepackage[margin=2.5cm]{geometry} % paper and margin formats as set by SPP
-\usepackage{subfig}
-
 \parindent 0.5cm    % paragraphs indent
 \topmargin=-2cm
 
