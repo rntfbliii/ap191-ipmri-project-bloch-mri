@@ -14,11 +14,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up LaTeX environment
-      uses: dante-ev/latex-action@v1
+    - name: Compile LaTeX to PDF
+      uses: xu-cheng/latex-action@v2
       with:
         root_file: main.tex
         working_directory: paper
+        latexmk_use_xelatex: true
 
     - name: Commit and push compiled PDF
       run: |
