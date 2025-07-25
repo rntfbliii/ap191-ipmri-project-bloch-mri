@@ -8,8 +8,8 @@ voxel_size = 1.0
 image_dims = (matrix_size, matrix_size)
 
 # Spin-Echo Sequence Parameters (ms)
-TR = 2000 # ms
-TE = 100  # ms
+TR = 2000 
+TE = 100  
 proton_density = 1.0
 
 # Tissue Relaxation Times
