@@ -81,25 +81,60 @@
 % \affil[2]{Department of Science, XX University, Country}
 % \affil[3]{Physics Institute, Country}
 % \affil[*]{\corremail{amsurname@university.edu} }
+\begin{abstract}
+\noindent
+%--------------------------------------------------
+% Include abstract and keywords here
+%--------------------------------------------------
+Perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
+
+\keywords{keyword 1, keyword 2}
+
+\end{abstract}
+
 \maketitle
 \thispagestyle{titlestyle}
 %--------------------------------------------------
 % the main text of your paper begins here
 %--------------------------------------------------
-\section{Introduction}\label{sec:intro}
-Magnetic Resonance Imaging (MRI) is a powerful, non-invasive imaging modality whose contrast is governed by intrinsic tissue parameters: the longitudinal relaxation time ($T_1$) and the transverse relaxation relaxation time ($T_2$) \cite{brown2014}. The response of tissues to radiofrequency excitation and the relaxation dynamics are described by the Bloch equations \cite{bloch1946}, which capture the time evolution of the net magnetization vector under specific imaging parameters such as repetition time ($T_R$) and echo time ($T_E$).
 
-The steady-state solution of the Bloch equations for a spin-echo sequence provides a formula for the observed signal intensity based on $T_1, T_2,$ and other sequence parameters \cite{bernstein2004}.  This project leverages this steady-state solution to explore how intra-regional variations in \(T_1\) and \(T_2\) (e.g., within a lesion) affect the final signal intensity and perceived image contrast.
+\section{Statement of the Problem}\label{sec:intro}
+Magnetic Resonance Imaging (MRI) is a non-invasive diagnostic technique widely used in clinical and research settings for its ability to produce detailed anatomical and functional images without ionizing radiation. The contrast in MRI images is fundamentally governed by intrinsic tissue parameters, primarily the longitudinal relaxation time ($T_1$) and the transverse relaxation time ($T_2$) \cite{brown2014}. These parameters reflect how different tissues return to equilibrium after perturbation by radiofrequency (RF) pulses and are critical to understanding signal formation. The time evolution of the net magnetization vector in response to RF excitation and relaxation processes is described by the Bloch equations \cite{bloch1946}.
 
-While many educational simulations treat tissue regions as homogeneous in relaxation behavior, real biological tissue---particularly pathological tissue---often exhibits heterogeneity in relaxation parameters due to perfusion, necrosis, edema, or other microstructural effects \cite{tofts2003}. Simulating these variations can provide insight into how MRI encodes subtle differences in tissue composition.
+In particular, spin-echo sequences—common in both clinical and research MRI—yield a steady-state solution to the Bloch equations that relates signal intensity to $T_1$, $T_2$, repetition time ($T_R$), and echo time ($T_E$) \cite{bernstein2004}. This steady-state solution forms the basis for simulating and interpreting MRI contrast. Most introductory and educational simulations rely on simplifying assumptions, including the notion that tissue compartments are homogeneous in their relaxation properties. However, this abstraction oversimplifies the complexity of biological tissues, especially under pathological conditions.
 
-\section{Objectives}\label{sec:objectives}
-The primary objective of this study is to simulate and analyze MRI signal contrast arising from spatially varying \(T_1\) and \(T_2\) relaxation times within a tissue slice using the Bloch equations. To achieve this, the study specifically aims to:
+In reality, tissues often exhibit intra-regional heterogeneity in relaxation parameters due to variations in cellularity, water content, perfusion, necrosis, or other microstructural and physiological processes \cite{tofts2003}. For instance, tumors may contain a mixture of viable cells, necrotic cores, and edematous regions, each with subtly different $T_1$ and $T_2$ values. While these variations may not produce overt visual differences in standard MR images, they influence the local signal response and can affect both qualitative and quantitative interpretations of the image.
+
+This project focuses on understanding how spatial variations in $T_1$ and $T_2$ values within a single tissue region impact the resulting MRI signal, using numerical simulations grounded in the steady-state Bloch model. By going beyond homogeneous-tissue models, the study seeks to explore the degree to which intra-regional relaxation heterogeneity affects signal intensity and image contrast. Such insights are relevant for both medical imaging applications, where accurate tissue characterization is essential, and fundamental physics, where a detailed understanding of signal formation informs the design and interpretation of MR experiments.
+
+\section{General Purpose of the Study}\label{sec:generalobjectives}
+The purpose of this study is to simulate and analyze how spatial heterogeneity in \(T_1\) and \(T_2\) relaxation times within a tissue region influences MRI signal contrast, using the steady-state solution to the Bloch equations under spin-echo imaging conditions.
+
+\section{Specific Objectives}\label{sec:specificobjectives}
+To accomplish this, the study specifically aims to:
 \begin{enumerate}
-    \item Implement a computational model for MRI signal intensity using the steady-state solution of the Bloch equations under spin-echo conditions;
-    \item Encode spatial variation in relaxation parameters (\(T_1\), \(T_2\)) within a lesion region embedded in homogeneous background tissue; and
-    \item Generate and visualize synthetic contrast maps to assess the effect of intra-lesion gradients on signal intensity.
+    \item Derive and implement the steady-state signal expression for a spin-echo MRI sequence based on the Bloch equations;
+    \item Encode spatial variation in \(T_1\) and \(T_2\) relaxation parameters across a 2D tissue model with a lesion region; and
+    \item Generate and analyze synthetic contrast maps to assess the effect of intra-lesion relaxation gradients on MRI signal intensity.
 \end{enumerate}
+
+\section{Review of Related Literature}\label{sec:rrl}
+
+Magnetic Resonance Imaging (MRI) leverages the relaxation properties of nuclear spins---longitudinal (\( T_1 \)) and transverse (\( T_2 \))---to generate high-contrast images of soft tissues without ionizing radiation. The time evolution of magnetization under these relaxation processes is governed by the Bloch equations \cite{bloch1946}, forming the theoretical foundation of MRI. In the context of spin-echo sequences, the steady-state signal intensity can be described as 
+\[
+S(x, y) = \rho \left[ 1 - e^{-TR/T_1(x, y)}\right] e^{-TE/T_2(x, y)},
+\]
+where \( \rho \) is the proton density, and \( TR \) and \( TE \) are the repetition and echo times, respectively \cite{bernstein2004}. This formulation provides a direct quantitative relationship between tissue-specific relaxation parameters and image contrast \cite{brown2014}.
+
+Relaxation times vary significantly between tissue types and are influenced by imaging parameters and magnetic field strength. For example, Stanisz et al.\ \cite{stanisz2005} measured \( T_1 \) values in gray matter at 1.5 T, which is a widely used field strength for modern MRI machines \cite{brown2014}, to be within the range $1124 \pm 50$ ms, and \( T_2 \) values between $95 \pm 8$ ms. Bojorquez et al.\ \cite{bojorquez2017} further demonstrated that acquisition protocols and scanner-specific settings introduce substantial variability, highlighting the importance of reproducibility in clinical interpretation. Moreover, pathologies such as tumors often exhibit altered relaxation profiles due to changes in water content, cellular architecture, or necrosis, as noted in Tofts' review of quantitative MRI in disease states \cite{tofts2003}.
+
+Emerging work has shown that spatial heterogeneity in relaxation parameters can meaningfully affect image contrast. Does et al.\ \cite{does2002} observed multicomponent \( T_1 \) relaxation in rat brain tissue, attributing the behavior to underlying microstructural variations. Xu et al.\ \cite{xu2009} similarly showed that \( T_2 \) variability affects the accuracy of diffusion-weighted imaging, emphasizing the clinical impact of intra-tissue relaxation differences. Despite this, many MRI models assume homogeneity across regions of interest, which may limit their realism in depicting diseased tissues.
+
+Efforts to standardize quantitative MRI across platforms have underscored persistent challenges. A recent multi-center study using the NIST/ISMRM phantom reported inter-scanner variability in \( T_1 \) and \( T_2 \) under 7\%, but confirmed that minor discrepancies can still affect quantitative outcomes \cite{pasini2025}. Furthermore, myocardial studies by Wiesmüller et al.\ \cite{wiesmueller2020} revealed notable intra-segmental \( T_2 \) variation even under consistent imaging conditions, thus underscoring the importance of incorporating spatial gradients in modeling signal formation.
+
+Computational simulations using the Bloch equations offer a tractable framework for exploring these phenomena under controlled conditions. Recent tools such as BlochSim.jl \ \cite{blochsim} and other open-source packages for MRI signal modeling provide accessible environments for simulating magnetization dynamics, but typically assume spatial uniformity in tissue parameters. As such, simulations incorporating spatially varying \( T_1 \) and \( T_2 \) maps remain underutilized, despite their potential to visualize how subtle tissue gradients manifest as signal heterogeneity.
+
+In summary, while theoretical models and standardization phantoms have greatly improved our understanding of MRI contrast, there remains a gap in simulating how smooth spatial variations in relaxation parameters within lesions influence signal intensity under spin-echo conditions. This study addresses that gap by implementing voxel-wise relaxation maps within a 2D phantom, providing insight into the interplay between tissue heterogeneity and MRI signal behavior as a step toward bridging simplified simulations and the complex biological realities of clinical imaging.
 
 \section{Methodology}\label{sec:methods}
 
@@ -140,7 +175,7 @@ where:
 We construct a \(128 \times 128\) voxel matrix representing a tissue slice. A circular lesion of radius 25 pixels is placed at the center. The following parameter values are assigned:
 
 \begin{itemize}
-    \item \textit{Background (gray matter):} \(T_1 = 920\) ms; \(T_2 = 100\) ms
+    \item \textit{Background (gray matter):} \(T_1 = 1120\) ms; \(T_2 = 95\) ms
     \item \textit{Lesion Center (core):} \(T_1 = 1000\) ms; \(T_2 = 90\) ms
     \item \textit{Lesion Edge:} \(T_1 = 1400\) ms; \(T_2 = 130\) ms
 \end{itemize}
