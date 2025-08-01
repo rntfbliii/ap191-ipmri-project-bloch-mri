@@ -303,6 +303,14 @@ All simulations will be implemented in Python using \texttt{NumPy} for numerical
     \item A 2D signal intensity map computed from the spin-echo Bloch equation.
 \end{itemize}
 
+\subsubsection{Computational Model Implementation}
+
+The computational model is built upon the steady-state spin-echo signal equation derived. The simulation is performed by first defining a digital phantom as a 128x128 voxel matrix using \texttt{NumPy}. This phantom encoded the spatial variation in tissue relaxation parameters. The \(T_1(x,y)\) and \(T_2(x,y)\) values are assigned to each voxel according to the defined background and lesion properties, with the lesion exhibiting a radial gradient using Equations (4) and (5).
+
+Once the \(T_1\) and \(T_2\) maps are generated, the spin-echo signal intensity for each voxel, \(S(x,y)\), is computed element-wise by applying Equation (3):
+$$S(x, y) = \rho(x, y) \left[ 1 - e^{-TR / T_1(x, y)} \right] e^{-TE / T_2(x, y)}$$
+where \(TR\) and \(TE\) are the chosen sequence parameters. This approach allows for the direct simulation of an MRI image, where each pixel's intensity is a function of the underlying relaxation properties and the acquisition settings. The visualization of the resulting maps is then performed using \texttt{Matplotlib}.
+
 \section{Results and Discussion}\label{sec:rnd}
 
 This section presents the results of the Bloch equation-based simulation framework, evaluating how spatially heterogeneous \( T_1 \) and \( T_2 \) distributions affect spin-echo signal intensity and contrast. Through multi-scale visualization and LBCR-based quantification, we investigate how varying acquisition parameters (\( TR \), \( TE \)) influence simulated MRI contrast in the presence of tissue heterogeneity, in line with the objectives of visualizing voxel-level signal behaviors and optimizing contrast metrics.
