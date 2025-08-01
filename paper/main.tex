@@ -178,6 +178,104 @@ where:
     \item \(T_1(x, y)\) and \(T_2(x, y)\) are the voxelwise relaxation times.
 \end{itemize}
 
+\subsubsection{Derivation of the Steady-State Spin-Echo Signal}
+To simplify the derivation of the steady-state spin-echo signal, we make the following common assumptions:
+\begin{enumerate}
+    \item The derivation is performed in a rotating frame of reference that precesses at the Larmor frequency, which simplifies the precession term in the Bloch equations and makes the effects of RF pulses easier to visualize [3].
+    \item RF pulses ($90^\circ$ and $180^\circ$) are assumed to be instantaneous, meaning they rotate the magnetization without any relaxation occurring during the pulse itself.
+    \item The $90^\circ$ pulse perfectly rotates $M_z$ to $M_{xy}$, and the $180^\circ$ pulse perfectly flips $M_{xy}$ and $M_z$.
+    \item We consider the steady-state incoherent (SSI) condition, where any residual transverse magnetization from the previous repetition is assumed to have fully decayed before the next excitation pulse. This is generally valid for long $TR$ values.
+    \item We ignore the effects of macroscopic motion (flow) and microscopic random motion (diffusion) on the signal.
+    \item We assume a uniform proton density ($\rho$) throughout the tissue, which is multiplied at the end to represent the available magnetization.
+
+\vspace{12pt}
+
+Let the longitudinal magnetization just before the $90^\circ$ excitation pulse be $M_{z,TR}^-$. The transverse magnetization is assumed to be zero in the steady-state incoherent case.
+
+\vspace{12pt}
+
+The $90^\circ$ pulse rotates $M_{z,TR}^-$ into the transverse plane. So, immediately after the pulse:
+\begin{gather*}
+M_{xy}(0) = M_{z,TR}^- \\
+M_z(0) = 0
+\end{gather*}
+
+\vspace{12pt}
+
+During this period, the transverse magnetization decays due to $T_2$ relaxation, and the longitudinal magnetization recovers due to $T_1$ relaxation.
+\begin{gather*}
+M_{xy}(t) = M_{xy}(0) \cdot e^{-t/T_2} \\
+= M_{z,TR}^- \cdot e^{-t/T_2} \\
+M_z(t) = M_0(1 - e^{-t/T_1}) \quad (\text{since } M_z(0)=0 \text{ and it recovers towards } M_0).
+\end{gather*}
+At $t=TE/2$:
+\begin{gather*}
+M_{xy}(TE/2) = M_{z,TR}^- \cdot e^{-(TE/2)/T_2} \\
+M_z(TE/2) = M_0(1 - e^{-(TE/2)/T_1})
+\end{gather*}
+
+\vspace{12pt}
+
+The $180^\circ$ pulse rephases the transverse magnetization and inverts the longitudinal magnetization.
+The phase of $M_{xy}$ is effectively flipped, but its magnitude remains unchanged by the ideal $180^\circ$ pulse for the purpose of the echo formation. The dephasing that occurred is reversed.
+\begin{gather*}
+M_z(TE/2)^+ = -M_z(TE/2)^- = -M_0(1 - e^{-(TE/2)/T_1})
+\end{gather*}
+
+\vspace{12pt}
+
+The transverse magnetization now rephases and continues to decay due to $T_2$ relaxation. The longitudinal magnetization continues to recover towards $M_0$.
+At the echo time ($t=TE$), the signal is maximum due to rephasing.
+The transverse magnetization at the echo ($S_{echo}$) is the remaining magnitude of the transverse magnetization from before the $180^\circ$ pulse, now further decayed for another $TE/2$ duration.
+\begin{gather*}
+S_{echo} = M_{xy}(TE/2) \cdot e^{-(TE/2)/T_2} \\
+= (M_{z,TR}^- \cdot e^{-(TE/2)/T_2}) \cdot e^{-(TE/2)/T_2} \\
+S_{echo} = M_{z,TR}^- \cdot e^{-TE/T_2}
+\end{gather*}
+The longitudinal magnetization $M_z$ at $t=TE$ will recover from its inverted state:
+\begin{gather*}
+M_z(TE) = M_0 + (M_z(TE/2)^+ - M_0)e^{-(TE/2)/T_1} \\
+M_z(TE) = M_0 + (-M_0(1 - e^{-(TE/2)/T_1}) - M_0)e^{-(TE/2)/T_1} \\
+M_z(TE) = M_0 + (-M_0 + M_0 e^{-(TE/2)/T_1} - M_0)e^{-(TE/2)/T_1} \\
+M_z(TE) = M_0 + (-2M_0 + M_0 e^{-(TE/2)/T_1})e^{-(TE/2)/T_1} \\
+M_z(TE) = M_0 - 2M_0 e^{-(TE/2)/T_1} + M_0 e^{-TE/T_1}
+\end{gather*}
+
+\vspace{12pt}
+
+After the echo, the transverse magnetization is assumed to have decayed to zero for SSI. The longitudinal magnetization continues to recover during the remaining time $TR-TE$.
+\begin{gather*}
+M_{z,TR}^- = M_0 + (M_z(TE) - M_0)e^{-(TR-TE)/T_1}
+\end{gather*}
+Substitute $M_z(TE)$:
+\begin{gather*}
+M_{z,TR}^- = M_0 + (M_0 - 2M_0 e^{-(TE/2)/T_1} + M_0 e^{-TE/T_1} - M_0)e^{-(TR-TE)/T_1} \\
+M_{z,TR}^- = M_0 + (-2M_0 e^{-(TE/2)/T_1} + M_0 e^{-TE/T_1})e^{-(TR-TE)/T_1} \\
+M_{z,TR}^- = M_0 - 2M_0 e^{-TR/T_1 + TE/2T_1} + M_0 e^{-TR/T_1}
+\end{gather*}
+
+\vspace{12pt}
+
+This is where the steady-state condition is used. The initial $M_{z,TR}^-$ must be consistent with the recovery over $TR$.
+While the full derivation can be complex, for the steady-state incoherent (SSI) spin-echo, a simpler and more commonly used approach focuses on the recovery of longitudinal magnetization.
+Let $M_L(0)$ be the longitudinal magnetization just after the 90-degree pulse (which is 0). It recovers towards $M_0$ during $TR$.
+After a 90-degree pulse, $M_z$ is zero. It recovers during $TR$ to $M_0(1-e^{-TR/T_1})$. This would be the $M_{z,TR}^-$ for a simple excitation.
+However, in a spin-echo sequence, the signal is generated from the transverse magnetization. The steady-state incoherent condition implies that the relevant longitudinal magnetization for the next excitation pulse is simply $M_0(1-e^{-TR/T_1})$, as any transverse magnetization from the previous sequence has fully decayed [1, 5].
+Thus, the initial longitudinal magnetization available for conversion into transverse magnetization by the $90^\circ$ pulse is given by:
+\begin{gather*}
+M_{z,\text{available}} = M_0(1-e^{-TR/T_1})
+\end{gather*}
+This available longitudinal magnetization is then tipped into the transverse plane and experiences $T_2$ decay over the echo time $TE$. The $180^\circ$ pulse rephases but does not prevent $T_2$ decay.
+Therefore, the signal intensity ($S$) at the echo time $TE$ is proportional to the initial proton density ($\rho$) and the product of the recovery of longitudinal magnetization and the decay of transverse magnetization:
+\begin{gather*}
+S = \rho \cdot M_0(1-e^{-TR/T_1}) \cdot e^{-TE/T_2} \tag{2}
+\end{gather*}
+Assuming $M_0$ (the equilibrium magnetization) is proportional to the proton density $\rho$, we can incorporate $\rho$ directly into the signal equation. If we normalize $M_0$ to 1 (or absorb it into $\rho$), the equation simplifies to the one presented in your research proposal:
+\begin{gather*}
+S(x,y) = \rho(x,y)(1-e^{-TR/T_1(x,y)})e^{-TE/T_2(x,y)} \tag{3}
+\end{gather*}
+Where $S(x,y)$ is the MRI signal intensity at a specific voxel, and $M_0$ is subsumed into $\rho(x,y)$, which represents the proton density.
+
 \subsection{Phantom Design}
 
 We construct a \(128 \times 128\) voxel matrix representing a tissue slice. A circular lesion of radius 25 pixels is placed at the center. The following parameter values are assigned:
