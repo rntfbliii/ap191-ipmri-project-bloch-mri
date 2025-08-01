@@ -5,7 +5,7 @@
 \newcommand{\spp}{43\textsuperscript{rd}}
 \newcommand{\sppvenue}{University of the Philippines Manila, Padre Faura St., Manila, }
 %\newcommand{\sppvenue}{City, }
-\newcommand{\sppdate}{July 2025}
+\newcommand{\sppdate}{August 2025}
 
 
 % title style
@@ -86,8 +86,8 @@
 \fancyhf[c]{ }
 \fancyhf[r]{ }
 \fancyfoot[l]{}
-\fancyfoot[c]{\href{}{Research Proposal for an MRI Physics Project}
-\\ \href{}{APHYSICS 191: Introduction to the Physics of Magnetic Resonance Imaging}\\ \sppvenue \sppdate \\ \articlenum 1}
+\fancyfoot[c]{\href{}{Guided Research on the Physics of MRI}
+\\ \href{}{Submitted in Partial Fulfillment of Requirements in APHYSICS 191}\\ \sppvenue \sppdate \\ \articlenum 1}
 \fancyfoot[r]{}
 }
 
@@ -98,8 +98,8 @@
 \fancyhf[r]{}
 \fancyhf[c]{}
 \fancyfoot[l]{}
-\fancyfoot[c]{\href{}{Research Proposal for an MRI Physics Project} 
-\\ \href{}{APHYSICS 191: Introduction to the Physics of Magnetic Resonance Imaging}\\ \sppvenue \sppdate \\ \articlenum \thepage}
+\fancyfoot[c]{\href{}{Guided Research on the Physics of MRI}
+\\ \href{}{Submitted in Partial Fulfillment of Requirements in APHYSICS 191}\\ \sppvenue \sppdate \\ \articlenum 1}
 \fancyfoot[r]{}
 \pagestyle{fancy}
 
