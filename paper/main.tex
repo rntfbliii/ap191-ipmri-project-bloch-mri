@@ -181,12 +181,12 @@ where:
 \subsubsection{Derivation of the Steady-State Spin-Echo Signal}
 To simplify the derivation of the steady-state spin-echo signal, we make the following common assumptions:
 \begin{enumerate}
-    \item The derivation is performed in a rotating frame of reference that precesses at the Larmor frequency, which simplifies the precession term in the Bloch equations and makes the effects of RF pulses easier to visualize [3].
+    \item The derivation is performed in a rotating frame of reference that precesses at the Larmor frequency, which simplifies the precession term in the Bloch equations and makes the effects of RF pulses easier to visualize.
     \item RF pulses ($90^\circ$ and $180^\circ$) are assumed to be instantaneous, meaning they rotate the magnetization without any relaxation occurring during the pulse itself.
     \item The $90^\circ$ pulse perfectly rotates $M_z$ to $M_{xy}$, and the $180^\circ$ pulse perfectly flips $M_{xy}$ and $M_z$.
-    \item We consider the steady-state incoherent (SSI) condition, where any residual transverse magnetization from the previous repetition is assumed to have fully decayed before the next excitation pulse. This is generally valid for long $TR$ values.
-    \item We ignore the effects of macroscopic motion (flow) and microscopic random motion (diffusion) on the signal.
-    \item We assume a uniform proton density ($\rho$) throughout the tissue, which is multiplied at the end to represent the available magnetization.
+    \item The steady-state incoherent (SSI) condition is considered, where any residual transverse magnetization from the previous repetition is assumed to have fully decayed before the next excitation pulse. This is generally valid for long $TR$ values.
+    \item The effects of macroscopic motion (flow) and microscopic random motion (diffusion) on the signal are ignored.
+    \item A uniform proton density ($\rho$) is assumed throughout the tissue, which is multiplied at the end to represent the available magnetization.
 \end{enumerate}
 
 \vspace{12pt}
@@ -269,11 +269,11 @@ M_{z,\text{available}} = M_0(1-e^{-TR/T_1})
 This available longitudinal magnetization is then tipped into the transverse plane and experiences $T_2$ decay over the echo time $TE$. The $180^\circ$ pulse rephases but does not prevent $T_2$ decay.
 Therefore, the signal intensity ($S$) at the echo time $TE$ is proportional to the initial proton density ($\rho$) and the product of the recovery of longitudinal magnetization and the decay of transverse magnetization:
 \begin{gather*}
-S = \rho \cdot M_0(1-e^{-TR/T_1}) \cdot e^{-TE/T_2} \tag{2}
+S = \rho \cdot M_0(1-e^{-TR/T_1}) \cdot e^{-TE/T_2}
 \end{gather*}
 Assuming $M_0$ (the equilibrium magnetization) is proportional to the proton density $\rho$, we can incorporate $\rho$ directly into the signal equation. If we normalize $M_0$ to 1 (or absorb it into $\rho$), the equation simplifies to the one presented in your research proposal:
 \begin{gather*}
-S(x,y) = \rho(x,y)(1-e^{-TR/T_1(x,y)})e^{-TE/T_2(x,y)} \tag{3}
+S(x,y) = \rho(x,y)(1-e^{-TR/T_1(x,y)})e^{-TE/T_2(x,y)}
 \end{gather*}
 Where $S(x,y)$ is the MRI signal intensity at a specific voxel, and $M_0$ is subsumed into $\rho(x,y)$, which represents the proton density.
 
