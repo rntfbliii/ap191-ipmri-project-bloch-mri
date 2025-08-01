@@ -261,7 +261,7 @@ This is where the steady-state condition is used. The initial $M_{z,TR}^-$ must 
 While the full derivation can be complex, for the steady-state incoherent (SSI) spin-echo, a simpler and more commonly used approach focuses on the recovery of longitudinal magnetization.
 Let $M_L(0)$ be the longitudinal magnetization just after the 90-degree pulse (which is 0). It recovers towards $M_0$ during $TR$.
 After a 90-degree pulse, $M_z$ is zero. It recovers during $TR$ to $M_0(1-e^{-TR/T_1})$. This would be the $M_{z,TR}^-$ for a simple excitation.
-However, in a spin-echo sequence, the signal is generated from the transverse magnetization. The steady-state incoherent condition implies that the relevant longitudinal magnetization for the next excitation pulse is simply $M_0(1-e^{-TR/T_1})$, as any transverse magnetization from the previous sequence has fully decayed [1, 5].
+However, in a spin-echo sequence, the signal is generated from the transverse magnetization. The steady-state incoherent condition implies that the relevant longitudinal magnetization for the next excitation pulse is simply $M_0(1-e^{-TR/T_1})$, as any transverse magnetization from the previous sequence has fully decayed.
 Thus, the initial longitudinal magnetization available for conversion into transverse magnetization by the $90^\circ$ pulse is given by:
 \begin{gather*}
 M_{z,\text{available}} = M_0(1-e^{-TR/T_1})
@@ -271,7 +271,7 @@ Therefore, the signal intensity ($S$) at the echo time $TE$ is proportional to t
 \begin{gather*}
 S = \rho \cdot M_0(1-e^{-TR/T_1}) \cdot e^{-TE/T_2}
 \end{gather*}
-Assuming $M_0$ (the equilibrium magnetization) is proportional to the proton density $\rho$, we can incorporate $\rho$ directly into the signal equation. If we normalize $M_0$ to 1 (or absorb it into $\rho$), the equation simplifies to the one presented in your research proposal:
+Assuming $M_0$ is proportional to the proton density $\rho$, we can incorporate $\rho$ directly into the signal equation. If we normalize $M_0$ to 1 (or absorb it into $\rho$), the equation simplifies to:
 \begin{gather*}
 S(x,y) = \rho(x,y)(1-e^{-TR/T_1(x,y)})e^{-TE/T_2(x,y)}
 \end{gather*}
