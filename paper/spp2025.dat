@@ -99,7 +99,7 @@
 \fancyhf[c]{}
 \fancyfoot[l]{}
 \fancyfoot[c]{\href{}{Guided Research on the Physics of MRI}
-\\ \href{}{Submitted in Partial Fulfillment of Requirements in APHYSICS 191}\\ \sppvenue \sppdate \\ \articlenum 1}
+\\ \href{}{Submitted in Partial Fulfillment of Requirements in APHYSICS 191}\\ \sppvenue \sppdate \\ \articlenum \thepage}
 \fancyfoot[r]{}
 \pagestyle{fancy}
 
