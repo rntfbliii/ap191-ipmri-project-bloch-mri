@@ -31,7 +31,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Please make sure that spp.dat (supplied with this template) is in your working directory or path 
+% Please make sure that spp.dat (supplied with this template) is in your working directory or path
 \input{spp2025.dat}
 
 %  Editorial staff will uncomment the next line
@@ -303,7 +303,7 @@ To simulate the impact of intra-lesional heterogeneity, 2D spatial maps of $ T_1
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[width=0.7\textwidth]{t1t2maps.png}
+\includegraphics[width=0.7\textwidth]{figures/t1t2maps.png}
 \caption{Simulated 2D and 3D spatial distributions of $T_1$ and $T_2$ relaxation times across a heterogeneous lesion phantom. Gradients reflect plausible intra-lesional variation consistent with gray–white matter properties and microstructural tissue differences.}
 \label{fig:t1t2maps}
 \end{figure}
@@ -317,14 +317,14 @@ To further illustrate spatial variation, a 1D horizontal signal profile was extr
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[width=0.4\textwidth]{signalintensitymap.png}
+\includegraphics[width=0.4\textwidth]{figures/signalintensitymap.png}
 \caption{Voxel-wise spin-echo signal intensity map at $T_R = 2000$ ms and $T_E = 100$ ms, showing spatial contrast shaped by local variations in $T_1$ and $T_2$. Brighter areas reflect favorable relaxation combinations for signal preservation.}
 \label{fig:signalmap}
 \end{figure}
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[width=0.8\textwidth]{1Dlineprofilesignal.png}
+\includegraphics[width=0.8\textwidth]{figures/1Dlineprofilesignal.png}
 \caption{1D signal intensity profile extracted along a horizontal slice, illustrating spatial modulation from gradual $T_1$ and $T_2$ changes. Nonlinear trends reflect the cumulative effects of relaxation heterogeneity.}
 \label{fig:lineprofile}
 \end{figure}
@@ -335,7 +335,7 @@ To evaluate classical contrast inversion behavior, signal intensities were compa
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[width=0.8\textwidth]{trtecomparisonforcontrast.png}
+\includegraphics[width=0.8\textwidth]{figures/trtecomparisonforcontrast.png}
 \caption{Contrast inversion behavior between (left) long \( T_R = 2000 \ \mathrm{ms},\ T_E = 100 \ \mathrm{ms} \) and (right) short \( T_R = 800 \ \mathrm{ms},\ T_E = 30 \ \mathrm{ms} \). The lesion core and edge exhibit inverted relative signal intensity between these regimes due to shifting $T_1$/$T_2$ contrast mechanisms.}
 \label{fig:inversion}
 \end{figure}
@@ -348,7 +348,7 @@ For each \( T_R \)-\( T_E \) combination, two metrics were computed: the Lesion-
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[width=\textwidth]{lbcrlbsdmatrix.png}
+\includegraphics[width=\textwidth]{figures/lbcrlbsdmatrix.png}
 \caption{Grid of simulated spin-echo images across combinations of \( T_R \) and \( T_E \), illustrating signal contrast variations in a heterogeneous lesion. Each tile is annotated with LBCR and LBSD values to quantify relative and absolute lesion-background separability.}
 \label{fig:grid}
 \end{figure}
@@ -404,7 +404,7 @@ To explore the dependence of contrast on acquisition parameters, heatmaps of LBC
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[width=\textwidth]{lbcrlbsdcombinedheatmaps.png}
+\includegraphics[width=\textwidth]{figures/lbcrlbsdcombinedheatmaps.png}
 \caption{Top: Heatmaps of LBCR and LBSD variation over \( T_R \)-\( T_E \) space; Bottom: Combined LBCR-LBSD heatmap over \( T_R \)-\( T_E \) space, highlighting the optimal parameters at \( T_R = 1000 \) ms and \( T_E = 10 \) ms.}
 \label{fig:lbcrsurface}
 \end{figure}
@@ -417,7 +417,7 @@ To refine this result, bilinear interpolation over a finer 25×25 grid of $T_R$ 
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[width=0.75\textwidth]{lbcrlbsdinterpolatedheatmap.png}
+\includegraphics[width=0.75\textwidth]{figures/lbcrlbsdinterpolatedheatmap.png}
 \caption{Interpolated LBCR-LBSD surface revealing a refined contrast maximum at $T_R = 1050$ ms and $T_E = 10$ ms, highlighting sub-grid contrast optimization.}
 \label{fig:lbcrlbsbinterpolated}
 \end{figure}
