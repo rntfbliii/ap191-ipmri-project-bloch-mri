@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
+from scipy.interpolate import RegularGridInterpolator
 
 # ========================
 # Phantom Construction
@@ -77,6 +78,23 @@ def compute_LBCR(signal_map, lesion_radius):
     lbcr = lesion_signal / background_signal
     return lbcr
 
+def compute_LBSD(signal_map, lesion_radius):
+    matrix_size = signal_map.shape[0]
+    center = matrix_size // 2
+
+    Y, X = np.meshgrid(np.arange(matrix_size), np.arange(matrix_size))
+    r = np.sqrt((X - center)**2 + (Y - center)**2)
+
+    lesion_mask = r <= lesion_radius
+    background_mask = r >= lesion_radius + 10  # 10-pixel buffer
+
+    lesion_signal = np.mean(signal_map[lesion_mask])
+    background_signal = np.mean(signal_map[background_mask])
+
+    lbsd = abs(lesion_signal - background_signal)
+    return lbsd
+
+
 # ========================
 # Parameters
 # ========================
@@ -116,34 +134,36 @@ display_maps(
 )
 
 # ========================
-# TR/TE Grid Simulation
+# Dual 3D Surface Plot: T1 and T2 Maps
 # ========================
-TR_values = [500, 1000, 2000, 3000]
-TE_values = [10, 50, 100, 150]
+X, Y = np.meshgrid(np.arange(matrix_size), np.arange(matrix_size))
+downsample = 2
+X_ds = X[::downsample, ::downsample]
+Y_ds = Y[::downsample, ::downsample]
+T1_ds = T1_map[::downsample, ::downsample]
+T2_ds = T2_map[::downsample, ::downsample]
 
-fig, axes = plt.subplots(len(TR_values), len(TE_values), figsize=(15, 15),
-                         gridspec_kw={'wspace': 0.4, 'hspace': 0.4})
-fig.suptitle('MRI Signal Simulation (Spin-Echo Varying TR/TE)', y=1.02, fontsize=16)
+fig = plt.figure(figsize=(14, 6))
 
-for i, TR in enumerate(TR_values):
-    for j, TE in enumerate(TE_values):
-        ax = axes[i, j]
-        signal = spin_echo_signal(T1_map, T2_map, TR, TE)
-        im = ax.imshow(signal, cmap='gray', vmin=0, vmax=1)
-        ax.set_title(f'TR={TR}ms\nTE={TE}ms', fontsize=9)
-        ax.axis('off')
-        if j == len(TE_values) - 1:
-            cax = fig.add_axes([ax.get_position().x1 + 0.01,
-                                ax.get_position().y0,
-                                0.015,
-                                ax.get_position().height])
-            fig.colorbar(im, cax=cax, label='Signal Intensity')
+ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+surf1 = ax1.plot_surface(X_ds, Y_ds, T1_ds, cmap='plasma', edgecolor='none')
+ax1.set_title('$T_1$ Relaxation Map')
+ax1.set_xlabel('X (pixels)')
+ax1.set_ylabel('Y (pixels)')
+ax1.set_zlabel('$T_1$ (ms)')
+fig.colorbar(surf1, ax=ax1, shrink=0.6, aspect=10, pad=0.1, label='$T_1$ (ms)')
 
-plt.figtext(0.5, 0.01,
-            'Note: Lesion at center with T1=1000–1400ms, T2=90–130ms. '
-            'Background: T1=920ms, T2=100ms.',
-            ha='center', fontsize=10)
+ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+surf2 = ax2.plot_surface(X_ds, Y_ds, T2_ds, cmap='viridis', edgecolor='none')
+ax2.set_title('$T_2$ Relaxation Map')
+ax2.set_xlabel('X (pixels)')
+ax2.set_ylabel('Y (pixels)')
+ax2.set_zlabel('$T_2$ (ms)')
+fig.colorbar(surf2, ax=ax2, shrink=0.6, aspect=10, pad=0.1, label='$T_2$ (ms)')
+
+plt.suptitle("Dual-Surface Comparison of T₁ and T₂ Relaxation Maps", fontsize=14)
 plt.tight_layout()
+plt.subplots_adjust(top=0.88)
 plt.show()
 
 # ========================
@@ -192,9 +212,13 @@ plt.tight_layout()
 plt.show()
 
 # ========================
-# TR/TE Grid + LBCR Overlay
+# TR/TE Grid + LBCR + LBSD Overlay
 # ========================
+TR_values = [100, 500, 1000, 1500, 2000]
+TE_values = [10, 30, 60, 90, 120]
+
 LBCR_matrix = np.zeros((len(TR_values), len(TE_values)))
+LBSD_matrix = np.zeros((len(TR_values), len(TE_values)))
 
 fig, axes = plt.subplots(len(TR_values), len(TE_values), figsize=(15, 15),
                          gridspec_kw={'wspace': 0.4, 'hspace': 0.4})
@@ -206,9 +230,12 @@ for i, TR in enumerate(TR_values):
         signal = spin_echo_signal(T1_map, T2_map, TR, TE)
         lbcr = compute_LBCR(signal, lesion_radius)
         LBCR_matrix[i, j] = lbcr
+        lbsd = compute_LBSD(signal, lesion_radius)
+        LBSD_matrix[i, j] = lbsd
+
 
         im = ax.imshow(signal, cmap='gray', vmin=0, vmax=1)
-        ax.set_title(f'TR={TR}ms\nTE={TE}ms\nLBCR={lbcr:.2f}', fontsize=9)
+        ax.set_title(f'TR={TR}, TE={TE}\nLBCR={lbcr:.2f}, LBSD={lbsd:.2f}', fontsize=8)
         ax.axis('off')
 
         if j == len(TE_values) - 1:
@@ -219,7 +246,7 @@ for i, TR in enumerate(TR_values):
             fig.colorbar(im, cax=cax, label='Signal Intensity')
 
 plt.figtext(0.5, 0.01,
-            'LBCR = Lesion-to-Background Contrast Ratio. Higher is better for visibility.',
+            'LBCR = Lesion-to-Background Contrast Ratio. LBSD = Lesion-to-Background Signal Difference.',
             ha='center', fontsize=10)
 plt.tight_layout()
 plt.show()
@@ -238,93 +265,70 @@ plt.colorbar(c, label='LBCR')
 plt.tight_layout()
 plt.show()
 
-# ========================
-# Surface Plot of LBCR
-# ========================
-TR_grid, TE_grid = np.meshgrid(TE_values, TR_values)
-
-fig = plt.figure(figsize=(10, 6))
-ax = fig.add_subplot(111, projection='3d')
-surf = ax.plot_surface(TE_grid, TR_grid, LBCR_matrix, cmap=cm.viridis)
-ax.set_xlabel('TE (ms)')
-ax.set_ylabel('TR (ms)')
-ax.set_zlabel('LBCR')
-ax.set_title('LBCR Surface Plot')
-fig.colorbar(surf, shrink=0.5, aspect=10)
-plt.tight_layout()
-plt.show()
-
-# ========================
-# Dual 3D Surface Plot: T1 and T2 Maps
-# ========================
-X, Y = np.meshgrid(np.arange(matrix_size), np.arange(matrix_size))
-downsample = 2
-X_ds = X[::downsample, ::downsample]
-Y_ds = Y[::downsample, ::downsample]
-T1_ds = T1_map[::downsample, ::downsample]
-T2_ds = T2_map[::downsample, ::downsample]
-
-fig = plt.figure(figsize=(14, 6))
-
-ax1 = fig.add_subplot(1, 2, 1, projection='3d')
-surf1 = ax1.plot_surface(X_ds, Y_ds, T1_ds, cmap='plasma', edgecolor='none')
-ax1.set_title('$T_1$ Relaxation Map')
-ax1.set_xlabel('X (pixels)')
-ax1.set_ylabel('Y (pixels)')
-ax1.set_zlabel('$T_1$ (ms)')
-fig.colorbar(surf1, ax=ax1, shrink=0.6, aspect=10, pad=0.1, label='$T_1$ (ms)')
-
-ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-surf2 = ax2.plot_surface(X_ds, Y_ds, T2_ds, cmap='viridis', edgecolor='none')
-ax2.set_title('$T_2$ Relaxation Map')
-ax2.set_xlabel('X (pixels)')
-ax2.set_ylabel('Y (pixels)')
-ax2.set_zlabel('$T_2$ (ms)')
-fig.colorbar(surf2, ax=ax2, shrink=0.6, aspect=10, pad=0.1, label='$T_2$ (ms)')
-
-plt.suptitle("Dual-Surface Comparison of T₁ and T₂ Relaxation Maps", fontsize=14)
-plt.tight_layout()
-plt.subplots_adjust(top=0.88)
-plt.show()
-
-# ========================
-# LBCR vs TE and TR
-# ========================
-TR_values = np.linspace(500, 3000, LBCR_matrix.shape[0])
-TE_values = np.linspace(10, 150, LBCR_matrix.shape[1])
-
-fixed_TR_value = 2000
-fixed_TR_idx = np.argmin(np.abs(TR_values - fixed_TR_value))
-lbcr_vs_TE = LBCR_matrix[fixed_TR_idx, :]
-max_TE_idx = np.argmax(lbcr_vs_TE)
-max_TE = TE_values[max_TE_idx]
-max_LBCR_TE = lbcr_vs_TE[max_TE_idx]
-
-plt.figure(figsize=(8, 4))
-plt.plot(TE_values, lbcr_vs_TE, marker='o', label=f'TR ≈ {TR_values[fixed_TR_idx]:.0f} ms')
-plt.scatter(max_TE, max_LBCR_TE, color='red', zorder=5, label=f'Max LBCR @ TE={max_TE:.0f}ms')
-plt.title('LBCR vs TE at Fixed TR')
+plt.figure(figsize=(8, 6))
+c = plt.imshow(LBSD_matrix, cmap='coolwarm', aspect='auto', origin='lower')
+plt.xticks(range(len(TE_values)), TE_values)
+plt.yticks(range(len(TR_values)), TR_values)
 plt.xlabel('TE (ms)')
-plt.ylabel('LBCR')
-plt.grid(True)
-plt.legend()
+plt.ylabel('TR (ms)')
+plt.title('LBSD Heatmap (TR vs TE)')
+plt.colorbar(c, label='LBSD')
 plt.tight_layout()
 plt.show()
 
-fixed_TE_value = 100
-fixed_TE_idx = np.argmin(np.abs(TE_values - fixed_TE_value))
-lbcr_vs_TR = LBCR_matrix[:, fixed_TE_idx]
-max_TR_idx = np.argmax(lbcr_vs_TR)
-max_TR = TR_values[max_TR_idx]
-max_LBCR_TR = lbcr_vs_TR[max_TR_idx]
+# Normalize both metrics to [0, 1]
+LBCR_norm = (LBCR_matrix - np.min(LBCR_matrix)) / (np.max(LBCR_matrix) - np.min(LBCR_matrix))
+LBSD_norm = (LBSD_matrix - np.min(LBSD_matrix)) / (np.max(LBSD_matrix) - np.min(LBSD_matrix))
 
-plt.figure(figsize=(8, 4))
-plt.plot(TR_values, lbcr_vs_TR, marker='s', color='orange', label=f'TE ≈ {TE_values[fixed_TE_idx]:.0f} ms')
-plt.scatter(max_TR, max_LBCR_TR, color='red', zorder=5, label=f'Max LBCR @ TR={max_TR:.0f}ms')
-plt.title('LBCR vs TR at Fixed TE')
-plt.xlabel('TR (ms)')
-plt.ylabel('LBCR')
-plt.grid(True)
+# Weighted combination (equal weights by default)
+alpha, beta = 0.35, 0.65
+combined_matrix = alpha * LBCR_norm + beta * LBSD_norm
+
+# Plot
+plt.figure(figsize=(8, 6))
+c = plt.imshow(combined_matrix, cmap='viridis', aspect='auto', origin='lower')
+plt.xticks(range(len(TE_values)), TE_values)
+plt.yticks(range(len(TR_values)), TR_values)
+plt.xlabel('TE (ms)')
+plt.ylabel('TR (ms)')
+plt.title(f'Combined LBCR + LBSD Heatmap\n(α={alpha}, β={beta})')
+plt.colorbar(c, label='Combined Score (Normalized)')
+plt.tight_layout()
+plt.show()
+
+i_max, j_max = np.unravel_index(np.argmax(combined_matrix), combined_matrix.shape)
+best_TR = TR_values[i_max]
+best_TE = TE_values[j_max]
+
+print(f"Best TR-TE combo (max combined score): TR={best_TR} ms, TE={best_TE} ms")
+
+# Fine-grained grid
+TR_fine = np.linspace(min(TR_values), max(TR_values), 25)
+TE_fine = np.linspace(min(TE_values), max(TE_values), 25)
+
+# Interpolator for combined score
+interp_func = RegularGridInterpolator((TR_values, TE_values), combined_matrix)
+
+# Generate meshgrid for interpolation
+TR_mesh, TE_mesh = np.meshgrid(TR_fine, TE_fine, indexing='ij')
+points = np.stack([TR_mesh.ravel(), TE_mesh.ravel()], axis=-1)
+
+# Evaluate interpolated values
+combined_interp = interp_func(points).reshape(len(TR_fine), len(TE_fine))
+
+max_idx = np.unravel_index(np.argmax(combined_interp), combined_interp.shape)
+best_TR_interp = TR_fine[max_idx[0]]
+best_TE_interp = TE_fine[max_idx[1]]
+
+print(f"Best interpolated TR-TE combo: TR = {best_TR_interp:.1f} ms, TE = {best_TE_interp:.1f} ms")
+
+plt.figure(figsize=(8, 6))
+plt.contourf(TE_fine, TR_fine, combined_interp, levels=50, cmap='viridis')
+plt.colorbar(label='Combined Score (Interpolated)')
+plt.scatter(best_TE_interp, best_TR_interp, color='red', s=60, label='Max Score')
+plt.xlabel('TE (ms)')
+plt.ylabel('TR (ms)')
+plt.title(f'Interpolated LBCR+LBSD Score\nMax at TR={best_TR_interp:.1f}ms, TE={best_TE_interp:.1f}ms')
 plt.legend()
 plt.tight_layout()
 plt.show()
