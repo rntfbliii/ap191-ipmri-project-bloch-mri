@@ -14,14 +14,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Check if only main.tex was changed
+    - name: Check if only paper/main.tex was changed
       id: check_diff
       run: |
         CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-        echo "Changed files:"
-        echo "$CHANGED_FILES"
+        echo "Changed files: $CHANGED_FILES"
 
-        if [ "$CHANGED_FILES" = "paper/main.tex" ]; then
+        # Count number of changed files
+        NUM_CHANGED=$(echo "$CHANGED_FILES" | wc -l)
+
+        if [[ "$CHANGED_FILES" == "paper/main.tex" && "$NUM_CHANGED" -eq 1 ]]; then
           echo "only_main_tex_changed=true" >> $GITHUB_OUTPUT
         else
           echo "only_main_tex_changed=false" >> $GITHUB_OUTPUT
