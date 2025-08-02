@@ -165,19 +165,6 @@ where \( \gamma \) is the gyromagnetic ratio, \( \vb{B} \) is the effective magn
 
 In a conventional spin-echo (SE) imaging sequence with repeated radiofrequency (RF) excitations, the observable signal intensity at each voxel $(x, y)$ can be modeled. After an initial transient period, the longitudinal magnetization reaches a dynamic equilibrium. If the repetition time (TR) is sufficiently long for the transverse magnetization to decay to zero before the next RF pulse, the system is said to be in a steady-state incoherent (SSI) condition. 
 
-Under these circumstances, the steady-state transverse magnetization, which is directly proportional to the MRI signal, is given by:
-\begin{align}
-    S(x, y) = \rho(x, y) \left[ 1 - e^{-TR / T_1(x, y)} \right] e^{-TE / T_2(x, y)}
-\end{align}
-where:
-\begin{itemize}
-    \item \(S(x, y)\) is the MRI signal intensity,
-    \item \(\rho(x, y)\) is the proton density (set to 1.0 throughout),
-    \item \(TR = 2000 \text{ ms}\), repetition time,
-    \item \(TE = 100 \text{ ms}\), echo time,
-    \item \(T_1(x, y)\) and \(T_2(x, y)\) are the voxelwise relaxation times.
-\end{itemize}
-
 \subsubsection{Derivation of the Steady-State Spin-Echo Signal}
 To simplify the derivation of the steady-state spin-echo signal, we make the following common assumptions:
 \begin{enumerate}
@@ -271,11 +258,18 @@ Therefore, the signal intensity ($S$) at the echo time $TE$ is proportional to t
 \begin{gather*}
 S = \rho \cdot M_0(1-e^{-TR/T_1}) \cdot e^{-TE/T_2}
 \end{gather*}
-Assuming $M_0$ is proportional to the proton density $\rho$, we can incorporate $\rho$ directly into the signal equation. If we normalize $M_0$ to 1 (or absorb it into $\rho$), the equation simplifies to:
-\begin{gather*}
-S(x,y) = \rho(x,y)(1-e^{-TR/T_1(x,y)})e^{-TE/T_2(x,y)}
-\end{gather*}
-Where $S(x,y)$ is the MRI signal intensity at a specific voxel, and $M_0$ is subsumed into $\rho(x,y)$, which represents the proton density.
+Assuming $M_0$ is proportional to the proton density $\rho$, we can incorporate $\rho$ directly into the signal equation. If we normalize $M_0$ to 1 (or absorb it into $\rho$), the steady-state transverse magnetization, which is directly proportional to the MRI signals, simplifies to:
+\begin{align}
+    S(x, y) = \rho(x, y) \left[ 1 - e^{-TR / T_1(x, y)} \right] e^{-TE / T_2(x, y)}
+\end{align}
+where:
+\begin{itemize}
+    \item \(S(x, y)\) is the MRI signal intensity,
+    \item \(\rho(x, y)\) is the proton density (set to 1.0 throughout),
+    \item \(TR = 2000 \text{ ms}\), repetition time,
+    \item \(TE = 100 \text{ ms}\), echo time,
+    \item \(T_1(x, y)\) and \(T_2(x, y)\) are the voxelwise relaxation times.
+\end{itemize}
 
 \subsection{Phantom Design}
 
