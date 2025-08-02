@@ -124,7 +124,7 @@ print("Center T1, T2:", T1_map[center, center], T2_map[center, center])
 print("Edge T1, T2:", T1_map[center, center + lesion_radius], T2_map[center, center + lesion_radius])
 
 # ========================
-# Plot Static Maps
+# Plot Static Maps T1 T2 and Signal Intensity
 # ========================
 display_maps(
     [T1_map, T2_map, signal_map],
@@ -167,21 +167,10 @@ plt.subplots_adjust(top=0.88)
 plt.show()
 
 # ========================
-# 1D Line Profiles
+# 1D Line Profile for Signal Intensity
 # ========================
 row_idx = matrix_size // 2
 x = np.arange(matrix_size)
-
-plt.figure(figsize=(10, 4))
-plt.plot(x, T1_map[row_idx], label='T1 (ms)', color='red')
-plt.plot(x, T2_map[row_idx], label='T2 (ms)', color='blue')
-plt.title('1D Line Profile: T1 and T2 Across Lesion (Row 64)')
-plt.xlabel('Pixel Position (x)')
-plt.ylabel('Relaxation Time (ms)')
-plt.legend()
-plt.grid(True)
-plt.tight_layout()
-plt.show()
 
 smoothed_signal = moving_average(signal_map[row_idx], window=5)
 plt.figure(figsize=(10, 4))
@@ -265,6 +254,10 @@ plt.colorbar(c, label='LBCR')
 plt.tight_layout()
 plt.show()
 
+# ========================
+# Heatmap of LBSD(TR, TE)
+# ========================
+
 plt.figure(figsize=(8, 6))
 c = plt.imshow(LBSD_matrix, cmap='coolwarm', aspect='auto', origin='lower')
 plt.xticks(range(len(TE_values)), TE_values)
@@ -275,6 +268,10 @@ plt.title('LBSD Heatmap (TR vs TE)')
 plt.colorbar(c, label='LBSD')
 plt.tight_layout()
 plt.show()
+
+# ========================
+# Combined Heatmap LBCR + LBSD
+# ========================
 
 # Normalize both metrics to [0, 1]
 LBCR_norm = (LBCR_matrix - np.min(LBCR_matrix)) / (np.max(LBCR_matrix) - np.min(LBCR_matrix))
@@ -295,6 +292,10 @@ plt.title(f'Combined LBCR + LBSD Heatmap\n(α={alpha}, β={beta})')
 plt.colorbar(c, label='Combined Score (Normalized)')
 plt.tight_layout()
 plt.show()
+
+# ========================
+# Interpolated Smooth LBCR + LBSD
+# ========================
 
 i_max, j_max = np.unravel_index(np.argmax(combined_matrix), combined_matrix.shape)
 best_TR = TR_values[i_max]
