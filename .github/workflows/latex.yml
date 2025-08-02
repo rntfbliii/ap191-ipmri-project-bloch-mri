@@ -14,7 +14,21 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Check if only main.tex was changed
+      id: check_diff
+      run: |
+        CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+        echo "Changed files:"
+        echo "$CHANGED_FILES"
+
+        if [ "$CHANGED_FILES" = "paper/main.tex" ]; then
+          echo "only_main_tex_changed=true" >> $GITHUB_OUTPUT
+        else
+          echo "only_main_tex_changed=false" >> $GITHUB_OUTPUT
+        fi
+
     - name: Compile LaTeX to PDF
+      if: steps.check_diff.outputs.only_main_tex_changed == 'true'
       uses: xu-cheng/latex-action@v2
       with:
         root_file: main.tex
@@ -22,6 +36,7 @@ jobs:
         latexmk_use_xelatex: true
 
     - name: Commit and push compiled PDF
+      if: steps.check_diff.outputs.only_main_tex_changed == 'true'
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
