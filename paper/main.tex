@@ -278,15 +278,42 @@ Multiple layers of post-processing and visualization were employed to evaluate t
 
 First, 2D colormaps and 3D surface plots were generated to visualize the spatial distribution of \( T_1 \), \( T_2 \), and the simulated signal intensity. A 1D line profile for signal intensity was generated along the central row to assess transitions across the lesion boundary, with smoothing applied via a moving average filter.
 
-To quantify lesion detectability, two contrast metrics were computed:
+To quantify lesion detectability, we define:
 \begin{itemize}
-    \item \textit{Lesion-to-Background Contrast Ratio (LBCR)} defined as the ratio of average signal within the lesion to the average signal in the background.
-    \item \textit{Lesion-to-Background Signal Difference (LBSD)} defined as the absolute difference between these two signal means.
+    \item \( \mathcal{L} \subset \Omega \): lesion region (within a circular radius \( R \));
+    \item \( \mathcal{B} \subset \Omega \): background region (outside a radius \( R + \delta \), where \( \delta \) is a spatial buffer); and
+    \item \( |\mathcal{L}| \), \( |\mathcal{B}| \): number of voxels in lesion and background regions.
 \end{itemize}
 
-A systematic grid of \( T_R \) and \( T_E \) values was used to compute LBCR and LBSD matrices, enabling contrast analysis over the parameter space. These matrices were visualized as heatmaps to highlight trends and optima. A normalized, weighted combination of LBCR and LBSD was also introduced to balance relative and absolute contrast effects, providing a single composite metric for optimization.
+The mean signal values in each region are:
+\begin{align}
+\bar{S}_L &= \frac{1}{|\mathcal{L}|} \sum_{\bm{r} \in \mathcal{L}} S(\bm{r}), \ \text{and} \notag \\
+\bar{S}_B &= \frac{1}{|\mathcal{B}|} \sum_{\bm{r} \in \mathcal{B}} S(\bm{r}). \notag
+\end{align}
 
-Finally, to achieve sub-grid precision in optimal  \( (T_R, T_E) \) selection, bilinear interpolation was performed using \texttt{RegularGridInterpolator} over a 25×25 fine grid of linearly spaced $T_R$ and $T_E$ values. The resulting contrast map, derived from combined LBCR and LBSD scores, was visualized via filled contour plots (\texttt{contourf}) with 50 levels. The global maximum was highlighted with a red marker to indicate the optimal parameter pair.
+Now, two contrast metrics were computed:
+\begin{itemize}
+    \item \textit{Lesion-to-Background Contrast Ratio (LBCR)} defined as the ratio of average signal within the lesion to the average signal in the background:
+    \begin{align}
+    \mathrm{LBCR}(T_R, T_E) = \frac{\bar{S}_L}{\bar{S}_B} 
+    = \frac{\displaystyle \sum_{\bm{r} \in \mathcal{L}} S(\bm{r}) / |\mathcal{L}|}
+           {\displaystyle \sum_{\bm{r} \in \mathcal{B}} S(\bm{r}) / |\mathcal{B}|} \label{eq:lbcr}
+    \end{align}
+    \item \textit{Lesion-to-Background Signal Difference (LBSD)} defined as the absolute difference between these two signal means:
+    \begin{align}
+    \mathrm{LBSD}(T_R, T_E) = \left| \bar{S}_L - \bar{S}_B \right|
+    = \left| \frac{1}{|\mathcal{L}|} \sum_{\bm{r} \in \mathcal{L}} S(\bm{r}) - \frac{1}{|\mathcal{B}|} \sum_{\bm{r} \in \mathcal{B}} S(\bm{r}) \right| \label{eq:lbsd}
+    \end{align}
+\end{itemize}
+
+A systematic grid of \( T_R \) and \( T_E \) values was used to compute LBCR and LBSD matrices via Equation~\eqref{eq:lbcr} and Equation~\eqref{eq:lbsd}, enabling contrast analysis over the parameter space. These matrices were visualized as heatmaps to highlight trends and optima. A normalized, weighted combination of LBCR and LBSD was also introduced to balance relative and absolute contrast effects, providing a single composite metric for optimization. Specifically, to balance the strengths of both metrics, a combined contrast metric, $\eta$, was defined as
+\begin{align}
+    \eta = 0.35 \cdot \text{LBCR}_\text{norm} + 0.65 \cdot \text{LBSD}_\text{norm}. \label{eq:combinedmetric}
+\end{align}
+
+The LBSD weight of 0.65 was chosen because absolute signal differences are critical for distinguishing subtle variations within the lesion’s radial relaxation gradients, particularly in clinical settings where lesion boundaries must be clearly delineated \cite{does2002}. The LBCR weight of 0.35 ensures that relative contrast, which aids visual interpretation, remains a contributing factor. 
+
+Finally, to achieve sub-grid precision in optimal  \( (T_R, T_E) \) selection, bilinear interpolation was performed using \texttt{RegularGridInterpolator} over a 25×25 fine grid of linearly spaced $T_R$ and $T_E$ values. The resulting contrast map, derived from combined LBCR and LBSD scores in Equation~\eqref{eq:combinedmetric}, was visualized via filled contour plots (\texttt{contourf}) with 50 levels. The global maximum was highlighted with a red marker to indicate the optimal parameter pair.
 
 \subsubsection{Code Availability}
 The complete source code used for phantom generation, spin-echo simulation, and LBCR/LBSD analysis is available at: \url{https://github.com/rntfbliii/ap191-ipmri-project-bloch-mri}. This repository includes the full Python script, input parameters, and output data used in all figures and analysis presented in this paper.
@@ -344,7 +371,7 @@ To evaluate classical contrast inversion behavior, signal intensities were compa
 
 To evaluate the impact of spatially varying \( T_1 \) and \( T_2 \) relaxation times on MRI signal contrast, a 5×5 grid of spin-echo images was generated using combinations of repetition times \( T_R \in \{100, 500, 1000, 1500, 2000\} \) ms and echo times \( T_E \in \{10, 30, 60, 90, 120\} \) ms, as shown in Figure~\ref{fig:grid}. These values were selected to span a range of clinically relevant parameters, enabling a comprehensive assessment of contrast behavior in a simulated 2D tissue phantom with a heterogeneous lesion. The phantom, designed with a circular lesion (radius 25 pixels) embedded in homogeneous gray matter, incorporated radial gradients in relaxation times: \( T_1 \) from 1000 ms (lesion core) to 1400 ms (lesion edge) and \( T_2 \) from 90 ms (core) to 130 ms (edge), with gray matter fixed at \( T_1 = 920 \) ms and \( T_2 = 100 \) ms \cite{stanisz2005, bojorquez2017}.
 
-For each \( T_R \)-\( T_E \) combination, two metrics were computed: the Lesion-to-Background Contrast Ratio (LBCR) and the Lesion-to-Background Signal Difference (LBSD). LBCR, defined as the ratio of the mean signal intensity in the lesion region to that in the surrounding gray matter, quantifies relative contrast, while LBSD, defined as the absolute difference in signal intensities, captures the magnitude of signal separation. Because LBCR can overemphasize contrast at low signal levels, and LBSD can underrepresent relative differences in high-signal regimes, combining both metrics allows for a more robust optimization framework that balances visual contrast and quantitative separability. These metrics build on prior work emphasizing objective contrast evaluation over subjective visual assessment \cite{dewilde1997, mustafa2021}.
+For each \( T_R \)-\( T_E \) combination, two metrics were computed: the Lesion-to-Background Contrast Ratio (LBCR) via Equation~\eqref{eq:lbcr} and the Lesion-to-Background Signal Difference (LBSD) via Equation~\eqref{eq:lbsd}. Because LBCR can overemphasize contrast at low signal levels, and LBSD can underrepresent relative differences in high-signal regimes, combining both metrics allows for a more robust optimization framework that balances visual contrast and quantitative separability. These metrics build on prior work emphasizing objective contrast evaluation over subjective visual assessment \cite{dewilde1997, mustafa2021}.
 
 \begin{figure}[htbp!]
 \centering
@@ -353,9 +380,9 @@ For each \( T_R \)-\( T_E \) combination, two metrics were computed: the Lesion-
 \label{fig:grid}
 \end{figure}
 
-Analysis of the simulated image grid revealed distinct, non-monotonic contrast behaviors resulting from the interplay between spin-echo timing parameters—repetition time (\( T_R \)) and echo time (\( T_E \))—and spatial heterogeneity in tissue relaxation. The highest Lesion-to-Background Contrast Ratio (LBCR), with a value of 1.06, was observed at \( T_R = 2000 \) ms and \( T_E = 120 \) ms. This configuration allows for substantial longitudinal relaxation recovery in both lesion and background while also maximizing \( T_2 \)-related signal decay, thereby enhancing relative contrast. Conversely, the highest Lesion-to-Background Signal Difference (LBSD), reaching 0.10, was found at \( T_R = 1000 \) ms and \( T_E = 10 \) ms, where short echo times preserve absolute signal magnitude differences before substantial transverse decay, and intermediate \( T_R \) values maintain dynamic range across tissues with divergent \( T_1 \) values.
+Analysis of the simulated image grid revealed distinct, non-monotonic contrast behaviors resulting from the interplay between spin-echo timing parameters—repetition time (\( T_R \)) and echo time (\( T_E \))—and spatial heterogeneity in tissue relaxation. The highest LBCR, with a value of 1.06, was observed at \( T_R = 2000 \) ms and \( T_E = 120 \) ms. This configuration allows for substantial longitudinal relaxation recovery in both lesion and background while also maximizing \( T_2 \)-related signal decay, thereby enhancing relative contrast. Conversely, the highest LBSD, reaching 0.10, was found at \( T_R = 1000 \) ms and \( T_E = 10 \) ms, where short echo times preserve absolute signal magnitude differences before substantial transverse decay, and intermediate \( T_R \) values maintain dynamic range across tissues with divergent \( T_1 \) values.
 
-To evaluate combined contrast efficacy, we introduced a hybrid metric composed of a weighted sum of LBCR (35\%) and LBSD (65\%). This combined contrast score peaked at the same \( T_R = 1000 \) ms and \( T_E = 10 \) ms configuration, as shown in Figure~\ref{fig:lbcrsurface}. The weighting scheme was selected to prioritize LBSD’s sensitivity to signal intensity separation—critical in detecting subtle intra-lesional variations—while retaining LBCR’s perceptual salience for visual contrast assessment. This approach aligns with the clinical imperative to optimize both detectability and discriminability, particularly in tissues exhibiting radially graded relaxation characteristics. Prior studies on contrast optimization and tissue heterogeneity similarly support the necessity of balancing absolute and relative contrast metrics \cite{tofts2003, does2002, xu2009}.
+To evaluate combined contrast efficacy, we introduced a hybrid metric composed of a weighted sum of LBCR (35\%) and LBSD (65\%) shown in Equation~\eqref{eq:combinedmetric}. This combined contrast score peaked at the same \( T_R = 1000 \) ms and \( T_E = 10 \) ms configuration, as shown in Figure~\ref{fig:lbcrsurface}. The weighting scheme was selected to prioritize LBSD’s sensitivity to signal intensity separation—critical in detecting subtle intra-lesional variations—while retaining LBCR’s perceptual salience for visual contrast assessment. This approach aligns with the clinical imperative to optimize both detectability and discriminability, particularly in tissues exhibiting radial gradations. Prior studies on contrast optimization and tissue heterogeneity similarly support the necessity of balancing absolute and relative contrast metrics \cite{tofts2003, does2002, xu2009}.
 
 In Figure~\ref{fig:grid}, different signal intensity maps were generated using Equation~\eqref{eq:signal} to simulate varying $T_R$ (100--2000 ms) and $T_E$ (10--120 ms) values. In the figure, darker regions indicate a lower signal intensity while the brighter regions indicate a high signal intensity. The following analysis highlights key \( T_R \)-\( T_E \) combinations to elucidate their impact on contrast:
 \begin{itemize}
@@ -408,8 +435,6 @@ To explore the dependence of contrast on acquisition parameters, heatmaps of LBC
 \caption{Top: Heatmaps of LBCR and LBSD variation over \( T_R \)-\( T_E \) space; Bottom: Combined LBCR-LBSD heatmap over \( T_R \)-\( T_E \) space, highlighting the optimal parameters at \( T_R = 1000 \) ms and \( T_E = 10 \) ms.}
 \label{fig:lbcrsurface}
 \end{figure}
-
-To balance the strengths of both metrics, a combined contrast metric was defined as \( 0.35 \cdot \text{LBCR} + 0.65 \cdot \text{LBSD} \). The LBSD weight of 0.65 was chosen because absolute signal differences are critical for distinguishing subtle variations within the lesion’s radial relaxation gradients, particularly in clinical settings where lesion boundaries must be clearly delineated \cite{does2002}. The LBCR weight of 0.35 ensures that relative contrast, which aids visual interpretation, remains a contributing factor. 
 
 Analysis of the combined LBCR-LBSD heatmap identified the optimal parameters at $T_R = 1000$ ms and $T_E = 10$ ms, where the combined metric maximized both lesion visibility and signal separation. This aligns with conventional $T_1$-weighted spin-echo imaging, where intermediate repetition times and short echo times enhance differences in longitudinal relaxation between tissues \cite{skalski2013}. This configuration is particularly effective for lesions exhibiting a radially decreasing gradient in both $T_1$ and $T_2$ values, as is often observed in high-grade gliomas. In such tumors, the periphery typically presents with vasogenic edema or infiltrative tumor tissue characterized by elevated $T_1$ and $T_2$, while the necrotic or hemorrhagic core exhibits shortened relaxation times due to increased cellularity, protein content, or hemosiderin deposition \cite{englund1986,blystad2017}. Consequently, a $T_1$-weighted acquisition emphasizes this relaxation gradient, producing dark cores and relatively bright peripheries—improving lesion visibility and internal heterogeneity.
 
